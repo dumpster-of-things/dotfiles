@@ -8,7 +8,7 @@ alias cmatrix='tput clear;cmatrix -abs -u 9 | lolcat -t -p 18;tput reset'
 alias portstat='ss -lntup'
 
 ## get external (public) ip address
-wget 2>/dev/null ; [ $? != 1 ] || alias pubIP='wget --https-only -qO - https://icanhazip.com'
+[[ ! -x $(which wget) ]] || alias pubIP='wget --https-only -qO - https://icanhazip.com'
 
 ## dimensions of working-terminal
 alias height='stty size | cut -d\  -f1'
@@ -16,6 +16,7 @@ alias width='stty size | cut -d\  -f2'
 
 ## disk space % used
 used() { df ${1:-${PWD:-$(pwd)}} | awk '/^Filesystem/{ next; }; {print $5}' ; }
+
 ## fail if disk % used is over [limit]
 savior() { (( $(used "${1}" | tr -d \%) < ${2:-90} )); }
 
@@ -24,7 +25,8 @@ restrictfn() { : "${*%\.*}" ; : "${_//[[:space:][:punct:]]/\_}" ; echo "${_//+(\
 alias rfn='restrictfn'
 
 ## strike-through text
-strike() { printf "\e[9m%s\e[m\n" "${@}" ; }
+# strike() { printf "\e[9m%s\e[m\n" "${@}" ; }
+alias strike='printf "\e[9m%s\e[m\n"'
 
 ## url formatting
 alias urlencode='url encode'
@@ -33,3 +35,6 @@ alias urldecode='url decode'
 ## calculate price after 6% sales tax
 afterTax() { echo "scale=2; (${@//[!0-9\.]/} * .06) + ${@//[!0-9\.]/}" | bc -l ; }
 alias price='afterTax'
+
+## cleanly numbered `ls`
+lsn() { local -i i=0 && for _ in $* ; do echo "$((++i)) ${_##*\/}" ; done ; }
