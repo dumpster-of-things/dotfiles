@@ -18,19 +18,12 @@ function _update_ps1() {
   local ESC="$?"
   #`   "why sprinkle diamonds on everything i eat?   `
 
-  ## WIP:   makeshift stdout session-cache
-  # [[ -z $_ ]] || 
-  #export _[${#_[@]}]="${_:-}"
-  # declare -gax _[${#_[@]}]="${_}"
-  #export _=( "${_}" ${_[@]:1} )
-
   ## PromptSectionDelimiter
   local PSD='\[\e[0m\]'
   #`   first of all,   `
 
   #`   because it's the most ballin shit   `
   #`    you can do with ya food;   `
-  ### * why was i doing this? `declare +x n i`
   local -i n i
   for n in {0,1} ; do for i in {0..7} ; do
 	Clr[$(((10*n)+i))]='\[\e['"$n;3${i}m"'\]'
