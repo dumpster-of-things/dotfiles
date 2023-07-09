@@ -2,45 +2,44 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
-# If not running interactively, don't do anything
+## If not running interactively, don't do anything
 #case $- in  *i*) ;;  *) return ; esac
 [[ $- == *i* ]] || return
 
-# don't put duplicate lines or lines starting with space in the history.
+## Don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
 
-# append to the history file, don't overwrite it
+## Append to the history file, don't overwrite it
 shopt -s histappend
 
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+## For setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 HISTSIZE=3072
 HISTFILESIZE=9216
 
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
+## Check the window size after each command and, if necessary,
+#   update the values of LINES and COLUMNS.
 shopt -s checkwinsize
 
-## on to enable pcre2 regex globally (for exmaple, within `case` statements)
+## On to enable pcre2 regex globally (for exmaple, within `case` statements)
 shopt -s extglob
 
-# If set, the pattern "**" used in a pathname expansion context will
-# match all files and zero or more directories and subdirectories.
+## If set, the pattern "**" used in a pathname expansion context will
+#   match all files and zero or more directories and subdirectories.
 #shopt -s globstar
 
-# make less more friendly for non-text input files, see lesspipe(1)
+## Make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-# set variable identifying the chroot you work in (used in the prompt below)
+## Set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then debian_chroot=$(cat /etc/debian_chroot) ; fi
 
-## enable programmable completion features (you don't need to enable
-## this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-## sources /etc/bash.bashrc).
+## Enable programmable completion features
+#   (you don't need to enable this, if it's already enabled
+#    in /etc/bash.bashrc and /etc/profile sources /etc/bash.bashrc).
 if ! shopt -oq posix; then if [ -f /usr/share/bash-completion/bash_completion ]; then . /usr/share/bash-completion/bash_completion ; elif [ -f /etc/bash_completion ]; then . /etc/bash_completion ; fi ; fi
-#
 
-### PROMPT Customizations ###
+### PROMPT Customizations
 if [[ -f ~/.promptrc ]]; then source ~/.promptrc
 else #default sequence:
   ## set a fancy prompt (non-color, unless we know we "want" color)
@@ -69,13 +68,14 @@ else
   case "$TERM" in  xterm*|rxvt*) PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1" ;;  esac
 fi
 ###
-## Alias definitions.
+
+### Alias definitions.
 [[ ! -f ~/.bash_aliases ]] || . ~/.bash_aliases
 
-## Additional PATH inclusions.
+### Additional PATH inclusions.
 [[ ! -f ~/.pathrc ]] || . ~/.pathrc
 
-## [Lineage] Build Environment Settings:
+### [LineageOS] Build Environment Settings:
 #export USE_CCACHE=1
 #export CCACHE_EXEC=/usr/bin/ccache
 #export CCACHE_DIR=/media/storage/.ccache
@@ -83,13 +83,12 @@ fi
 #export ANDROID_JACK_VM_ARGS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4G"
 #
 
-## Literally don't even remember what these are for.
-# pretty sure it had something to do with window decorations on flatpacks...
-# ...or maybe keybinds... or both.
+### Literally don't even remember what these are for.
+#   pretty sure it had something to do with window decorations on flatpacks...
+#   ...or maybe keybinds... or both.
 export GTK_IM_MODULE=ibus
 export XMODIFIERS=@im=ibus
 export QT_MODULE=ibus
-#
 
 ### Making tab completion of ./filenames work for op.
 # first, noticed that there is an existing file:'/usr/share/bash-completion/completions/op'
@@ -99,5 +98,8 @@ export QT_MODULE=ibus
 complete -r op 2>/dev/null
 # which disables `bash_completion` for `op` and uses bash's native filename completion instead.
 
-### instead of pulling in our other.rc(s) by default:
-alias otherz='[[ ! -f ~/.otherrc ]] || source ~/.otherrc'
+### Fix for Tilix
+[ ! $TILIX_ID ] || source /etc/profile.d/vte.sh
+
+### Use most instead of [more||less] as system PAGER.
+export PAGER="most"
