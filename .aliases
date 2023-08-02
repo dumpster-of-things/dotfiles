@@ -92,12 +92,15 @@ restrictfn() { : "${*%\.*}" ; : "${_//[[:space:][:punct:]]/\_}" ; echo "${_//+(\
 alias rfn='restrictfn'
 
 ## strike-through text
-#alias strike='printf "\e[9m%s\e[m\n"'
 strike() { while read line ; do printf "\e[9m%s\e[m\n" "${line}" ; done < <([ -t 0 ] ||  cat - ; for ((a=1;a<=$#;a++)); do echo "${!a}" ; done ) ; }
 
 ## url formatting
-#alias urlencode='url encode'
-#alias urldecode='url decode'
+#[[ ! -x $(which url) ]] || {
+#	alias urlencode='url encode'
+#	alias urldecode='url decode'
+#}
+# I modified the `url` script to be callable with symlinks for `urlencode`/`urldecode`.
+# This avoids the need for aliases, but mostly just struck me as a neat way to achieve something similar.
 
 ## calculate a price to include 6% sales tax
 afterTax() { echo "scale=2; (${@//[!0-9\.]/} * .06) + ${@//[!0-9\.]/}" | bc -l ; }
