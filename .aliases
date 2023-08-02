@@ -1,23 +1,90 @@
 ## misc
+nil='/dev/null'
+alias hush="2>$nil"
 alias suod='sudo'
 alias rga='rg --hidden -l -F'
 alias push='pushd -n'
 alias pop='popd -n'
-alias subl='subl --launch-or-new-window'
-alias cmatrix='tput clear;cmatrix -abs -u 9 | lolcat -t -p 18;tput reset'
 alias portstat='ss -lntup'
+[[ ! -x ${Subl:=$(which subl)} ]] || alias subl="$Subl --launch-or-new-window"
+[[ ! -x $(which cmatrix) ]] || alias cmatrix='tput clear;cmatrix -abs -u 9 | lolcat -t -p 18;tput reset'
+
+## `apt` pkg mgmt:
+[[ ! -x $(which apt) ]] || {
+	#alias apts='apt search'
+	alias apti='sudo apt-get install'
+	alias aptli='apt list --installed'
+	alias aptlu='apt list --upgradable'
+	alias aptsh='apt show'
+	alias aptca='apt-cache'
+	alias aptcash='apt-cache show'
+	alias aptr='sudo apt remove'
+	alias aptar='sudo apt autoremove'
+	alias aptu{pd,d}='sudo apt update'
+	alias aptu{pg,g}='sudo apt upgrade'
+	alias aptu{p,u}='sudo apt update && sudo apt upgrade'
+	alias aptdu='sudo apt dist-upgrade full-upgrade'
+}
+
+## `snap` pkg mgmt:
+[[ ! -x $(which snap) ]] || {
+	alias snapi='sudo snap install'
+	alias snapic='sudo snap install --classic'
+	alias snapl='snap list --color=always --unicode=always'
+	alias snapr='sudo snap remove'
+	alias snaps='snap search'
+	alias snapu='sudo snap refresh'
+}
+
+## `pip` pkg mgmt:
+[[ ! -x ${PIYUP:=$(which pip||which pip3||echo "/usr/bin/python3-pip")} ]] || {
+	alias pips="$PIYUP search"
+	alias pipi="$PIYUP install"
+	alias pipup="$PIYUP install --upgrade pip"
+	alias pip{I,iu}="$PIYUP install --upgrade --user"
+}
+
+## Directory Bookmarks
+Bin="$(realpath $HOME/bin)"
+Desktop="$(realpath $HOME/Desktop)"
+Documents="$(realpath $HOME/Documents)"
+Downloads="$(realpath $HOME/Downloads)"
+Music="$(realpath $HOME/Music)"
+Pictures="$(realpath $HOME/Pictures)"
+Projects="$(realpath $HOME/Projects)"
+Public="$(realpath $HOME/Public)"
+Templates="$(realpath $HOME/Templates)"
+Videos="$(realpath $HOME/Videos)"
+# the following function allows for direct traversal into subdirectories, for example: `Pictures Dank-Memes/NSFW`
+chgDir() { cd ${!1}/${@:2} ; }
+# yeah the use of pointers is probably excessive but whatevs, they're there...
+for _ in {b,B}in {d,D}esktop {d,D}ocuments {d,D}ownloads {m,M}usic {p,P}ictures {p,P}rojects {p,P}ublic {t,T}emplates {v,V}ideos ; do
+    alias $_="chgDir ${_^}"
+done
+
+## `date` shorthand
+alias d8="date '+%Y%m%d'"
+alias dt="date '+%Y%m%d%H%M%S'"
+alias day="date '+%^a'"
+alias dayt="date '+%Y%m%d%^a'"
+alias DT="date '+%Y%m%d%^a%H%M%S'"
 
 ## get external (public) ip address
 [[ ! -x $(which wget) ]] || alias pubIP='wget --https-only -qO - https://icanhazip.com'
 
-## dimensions of working-terminal
-alias height='stty size | cut -d\  -f1'
-alias width='stty size | cut -d\  -f2'
+## get dimensions of working-terminal
+[[ -x ${TermSize:=$(realpath $(which getSize))} ]] && {
+	alias height="$TermSize y"
+	alias width="$TermSize x"
+} || {
+	alias height='stty size | cut -d\  -f1'
+	alias width='stty size | cut -d\  -f2'
+}
 
-## disk space % used
+## check the used space (%) on the underlying disk of an optionally specified PATH  (default is ./ )
 used() { df ${1:-${PWD:-$(pwd)}} | awk '/^Filesystem/{ next; }; {print $5}' ; }
 
-## fail if disk % used is over [limit]
+## fail if used disk space (%) is over an optionally specified limit  (default is 90% )
 savior() { (( $(used "${1}" | tr -d \%) < ${2:-90} )); }
 
 ## restrict file names
@@ -25,14 +92,14 @@ restrictfn() { : "${*%\.*}" ; : "${_//[[:space:][:punct:]]/\_}" ; echo "${_//+(\
 alias rfn='restrictfn'
 
 ## strike-through text
-# strike() { printf "\e[9m%s\e[m\n" "${@}" ; }
-alias strike='printf "\e[9m%s\e[m\n"'
+#alias strike='printf "\e[9m%s\e[m\n"'
+strike() { while read line ; do printf "\e[9m%s\e[m\n" "${line}" ; done < <([ -t 0 ] ||  cat - ; for ((a=1;a<=$#;a++)); do echo "${!a}" ; done ) ; }
 
 ## url formatting
-alias urlencode='url encode'
-alias urldecode='url decode'
+#alias urlencode='url encode'
+#alias urldecode='url decode'
 
-## calculate price after 6% sales tax
+## calculate a price to include 6% sales tax
 afterTax() { echo "scale=2; (${@//[!0-9\.]/} * .06) + ${@//[!0-9\.]/}" | bc -l ; }
 alias price='afterTax'
 
